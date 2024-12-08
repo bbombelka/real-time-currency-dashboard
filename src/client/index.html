@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Currency rates live </h1>
+    <div >Waiting for currencies</div>
+    <div><span>EUR</span><span id="euro"></span></div>
+    <div><span>USD</span><span id="usd"></span></div>
+
+
+    <script>
+        const socket = io('http://localhost:3000');
+
+        // Listen for random numbers from the server
+        socket.on('randomNumber', (currencies) => {
+            document.getElementById('currencies').innerText = `Random Number: ${currencies}`;
+            console.log('Received:', currencies);
+        });
+    </script>
+</body>
+</html>
