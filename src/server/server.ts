@@ -2,46 +2,68 @@ import express, { Request, Response } from "express";
 import { createServer } from "http";
 import path from "path";
 import { Server, Socket } from "socket.io";
+import auth from "./middleware/auth";
+import { EventEmitter } from "events";
+import { Currency } from "./interface/Currency";
+import { CurrencyItem } from "./interface/CurrencyItem";
+import userChoice from "./maps/UserChoice.map";
+import eventEmitter from "./EventEmitter";
+import { latestRates } from "./controllers/CurrencyController";
 
-// Initialize Express app and HTTP server
 const app = express();
 const httpServer = createServer(app);
 
-// Initialize Socket.IO
 const io = new Server(httpServer, {
   cors: {
-    origin: "*", // Adjust this for specific domains
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
 
 app.use(express.static(path.join(__dirname, "client")));
-// Serve a simple message at the root
+
 app.get("/", (req: Request, res: Response) => {
   // res.send('/client');
   // res.sendFile(path.join(__dirname + "client/index.html"));
 });
 
-// Handle client connections
+io.use(auth);
+
 io.on("connection", (socket: Socket) => {
   console.log(`Client connected: ${socket.id}`);
 
-  // Send random number every 5 seconds
-  const interval = setInterval(() => {
-    const eurValue = Math.floor(Math.random() * 100);
-    const usdValue = Math.floor(Math.random() * 100);
-    socket.emit("randomNumber", [eurValue, usdValue]);
-  }, 5000);
-
-  // Handle client disconnect
   socket.on("disconnect", () => {
     console.log(`Client disconnected: ${socket.id}`);
-    clearInterval(interval); // Clean up interval
+    userChoice.delete(socket.id);
+  });
+
+  socket.on("set-currencies", (currencies) => {
+    userChoice.set(socket.id, currencies ?? []);
   });
 });
 
-// Start the server
+eventEmitter.on("rates-change", () => {
+  if (!userChoice.size) {
+    return;
+  }
+
+  userChoice.forEach((userSelectedCurrencies) => {
+    const currenciesToSend = latestRates.currencies.filter(({ currency }) =>
+      userSelectedCurrencies.includes(currency)
+    );
+
+    io.emit("send-currencies", currenciesToSend);
+  });
+});
+
 const PORT = 3000;
 httpServer.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+// process.on("SIGINT", () => {
+//   clearInterval(updateCurrenciesIndex);
+//   httpServer.close(() => {
+//     process.exit();
+//   });
+// });

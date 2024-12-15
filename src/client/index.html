@@ -14,13 +14,27 @@
 
 
     <script>
-        const socket = io('http://localhost:3000');
 
-        // Listen for random numbers from the server
-        socket.on('randomNumber', (currencies) => {
-            document.getElementById('currencies').innerText = `Random Number: ${currencies}`;
-            console.log('Received:', currencies);
+        const socket = io('http://localhost:3000', { auth: { token: "valid_token" }});
+
+        socket.on('connect', data => {
+            
+            socket.emit('set-currencies', ['pln', 'eur', 'czk'])
+
+        }
+            )
+
+       
+        socket.on('send-currencies', (currencies) => {
+            console.log(currencies)
         });
+
+        socket.on("connect_error", (err) => {
+            console.error("Connection error:", err.message);
+        });
+
+        socket.on('disconnect', data => console.log(data, 'client disconnected'
+        ) )
     </script>
 </body>
 </html>
