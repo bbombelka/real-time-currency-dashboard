@@ -3,9 +3,6 @@ import { createServer } from "http";
 import path from "path";
 import { Server, Socket } from "socket.io";
 import auth from "./middleware/auth";
-import { EventEmitter } from "events";
-import { Currency } from "./interface/Currency";
-import { CurrencyItem } from "./interface/CurrencyItem";
 import userChoice from "./maps/UserChoice.map";
 import eventEmitter from "./EventEmitter";
 import { latestRates } from "./controllers/CurrencyController";
@@ -40,16 +37,15 @@ io.on("connection", (socket: Socket) => {
   socket.on("set-currencies", (currencies) => {
     userChoice.set(socket.id, currencies ?? []);
   });
-});
 
-eventEmitter.on("rates-change", () => {
-  if (!userChoice.size) {
-    return;
-  }
+  eventEmitter.on("rates-change", () => {
+    if (!userChoice.size) {
+      return;
+    }
 
-  userChoice.forEach((userSelectedCurrencies) => {
+    const userSelectedCurrencies = userChoice.get(socket.id);
     const currenciesToSend = latestRates.currencies.filter(({ currency }) =>
-      userSelectedCurrencies.includes(currency)
+      userSelectedCurrencies?.includes(currency)
     );
 
     io.emit("send-currencies", currenciesToSend);

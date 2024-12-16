@@ -18,7 +18,6 @@
         const socket = io('http://localhost:3000', { auth: { token: "valid_token" }});
 
         socket.on('connect', data => {
-            
             socket.emit('set-currencies', ['pln', 'eur', 'czk'])
 
         }
