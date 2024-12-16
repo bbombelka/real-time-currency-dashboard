@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { createServer } from "http";
-import path from "path";
+
 import { Server, Socket } from "socket.io";
 import auth from "./middleware/auth";
 import userChoice from "./maps/UserChoice.map";
@@ -10,6 +10,8 @@ import { latestRates } from "./controllers/CurrencyController";
 const app = express();
 const httpServer = createServer(app);
 
+app.use(express.static("client"));
+
 const io = new Server(httpServer, {
   cors: {
     origin: "*",
@@ -17,10 +19,8 @@ const io = new Server(httpServer, {
   },
 });
 
-app.use(express.static(path.join(__dirname, "client")));
-
 app.get("/", (req: Request, res: Response) => {
-  // res.send('/client');
+  // res.send("/client");
   // res.sendFile(path.join(__dirname + "client/index.html"));
 });
 
@@ -48,7 +48,7 @@ io.on("connection", (socket: Socket) => {
       userSelectedCurrencies?.includes(currency)
     );
 
-    io.emit("send-currencies", currenciesToSend);
+    socket.emit("send-currencies", currenciesToSend);
   });
 });
 

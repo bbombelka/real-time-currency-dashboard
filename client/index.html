@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Client</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  </head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .currency {
+      margin-bottom: 10px;
+    }
+    .flag {
+      margin-right: 10px;
+    }
+    #selectedCurrencies {
+      margin-top: 20px;
+    }
+    #selectedCurrencies ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    #selectedCurrencies li {
+      margin-bottom: 5px;
+    }
+  </style>
+
+  <body>
+    <h1>Select European Currencies</h1>
+    <form id="currencyForm">
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="eur"
+          name="currency"
+          value="eur"
+          data-name="Euro"
+          data-flag="🇪🇺"
+          data-value="0.92"
+        />
+        <label for="eur">
+          <span class="flag">🇪🇺</span> Euro (EUR) - European Union
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="gbp"
+          name="currency"
+          value="gbp"
+          data-name="British Pound"
+          data-flag="🇬🇧"
+          data-value="0.78"
+        />
+        <label for="gbp">
+          <span class="flag">🇬🇧</span> British Pound (GBP) - United Kingdom
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="chf"
+          name="currency"
+          value="chf"
+          data-name="Swiss Franc"
+          data-flag="🇨🇭"
+          data-value="0.90"
+        />
+        <label for="chf">
+          <span class="flag">🇨🇭</span> Swiss Franc (CHF) - Switzerland
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="sek"
+          name="currency"
+          value="sek"
+          data-name="Swedish Krona"
+          data-flag="🇸🇪"
+          data-value="10.93"
+        />
+        <label for="sek">
+          <span class="flag">🇸🇪</span> Swedish Krona (SEK) - Sweden
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="nok"
+          name="currency"
+          value="nok"
+          data-name="Norwegian Krone"
+          data-flag="🇳🇴"
+          data-value="10.70"
+        />
+        <label for="nok">
+          <span class="flag">🇳🇴</span> Norwegian Krone (NOK) - Norway
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="dkk"
+          name="currency"
+          value="dkk"
+          data-name="Danish Krone"
+          data-flag="🇩🇰"
+          data-value="6.88"
+        />
+        <label for="dkk">
+          <span class="flag">🇩🇰</span> Danish Krone (DKK) - Denmark
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="pln"
+          name="currency"
+          value="pln"
+          data-name="Polish Zloty"
+          data-flag="🇵🇱"
+          data-value="4.13"
+        />
+        <label for="pln">
+          <span class="flag">🇵🇱</span> Polish Zloty (PLN) - Poland
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="czk"
+          name="currency"
+          value="czk"
+          data-name="Czech Koruna"
+          data-flag="🇨🇿"
+          data-value="22.97"
+        />
+        <label for="czk">
+          <span class="flag">🇨🇿</span> Czech Koruna (CZK) - Czech Republic
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="huf"
+          name="currency"
+          value="huf"
+          data-name="Hungarian Forint"
+          data-flag="🇭🇺"
+          data-value="360.00"
+        />
+        <label for="huf">
+          <span class="flag">🇭🇺</span> Hungarian Forint (HUF) - Hungary
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="ron"
+          name="currency"
+          value="ron"
+          data-name="Romanian Leu"
+          data-flag="🇷🇴"
+          data-value="4.58"
+        />
+        <label for="ron">
+          <span class="flag">🇷🇴</span> Romanian Leu (RON) - Romania
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="bgn"
+          name="currency"
+          value="bgn"
+          data-name="Bulgarian Lev"
+          data-flag="🇧🇬"
+          data-value="1.80"
+        />
+        <label for="bgn">
+          <span class="flag">🇧🇬</span> Bulgarian Lev (BGN) - Bulgaria
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="hrk"
+          name="currency"
+          value="hrk"
+          data-name="Croatian Kuna"
+          data-flag="🇭🇷"
+          data-value="7.00"
+        />
+        <label for="hrk">
+          <span class="flag">🇭🇷</span> Croatian Kuna (HRK) - Croatia
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="rub"
+          name="currency"
+          value="rub"
+          data-name="Russian Ruble"
+          data-flag="🇷🇺"
+          data-value="96.00"
+        />
+        <label for="rub">
+          <span class="flag">🇷🇺</span> Russian Ruble (RUB) - Russia
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="isk"
+          name="currency"
+          value="isk"
+          data-name="Icelandic Krona"
+          data-flag="🇮🇸"
+          data-value="137.50"
+        />
+        <label for="isk">
+          <span class="flag">🇮🇸</span> Icelandic Krona (ISK) - Iceland
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="uah"
+          name="currency"
+          value="uah"
+          data-name="Ukrainian Hryvnia"
+          data-flag="🇺🇦"
+          data-value="36.70"
+        />
+        <label for="uah">
+          <span class="flag">🇺🇦</span> Ukrainian Hryvnia (UAH) - Ukraine
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="try"
+          name="currency"
+          value="try"
+          data-name="Turkish Lira"
+          data-flag="🇹🇷"
+          data-value="28.80"
+        />
+        <label for="try">
+          <span class="flag">🇹🇷</span> Turkish Lira (TRY) - Turkey
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="rsd"
+          name="currency"
+          value="rsd"
+          data-name="Serbian Dinar"
+          data-flag="🇷🇸"
+          data-value="110.00"
+        />
+        <label for="rsd">
+          <span class="flag">🇷🇸</span> Serbian Dinar (RSD) - Serbia
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="mdl"
+          name="currency"
+          value="mdl"
+          data-name="Moldovan Leu"
+          data-flag="🇲🇩"
+          data-value="17.60"
+        />
+        <label for="mdl">
+          <span class="flag">🇲🇩</span> Moldovan Leu (MDL) - Moldova
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="bam"
+          name="currency"
+          value="bam"
+          data-name="Bosnia and Herzegovina Convertible Mark"
+          data-flag="🇧🇦"
+          data-value="1.80"
+        />
+        <label for="bam">
+          <span class="flag">🇧🇦</span> Bosnia and Herzegovina Convertible Mark
+          (BAM) - Bosnia and Herzegovina
+        </label>
+      </div>
+      <div class="currency">
+        <input
+          type="checkbox"
+          id="mkd"
+          name="currency"
+          value="mkd"
+          data-name="Macedonian Denar"
+          data-flag="🇲🇰"
+          data-value="57.30"
+        />
+        <label for="mkd">
+          <span class="flag">🇲🇰</span> Macedonian Denar (MKD) - North Macedonia
+        </label>
+      </div>
+      <button type="button" onclick="displaySelectedCurrencies()">
+        Submit
+      </button>
+    </form>
+
+    <div id="selectedCurrencies">
+      <h2>Selected Currencies</h2>
+      <ul id="currencyList"></ul>
+    </div>
+
+    <script>
+      const socket = io("http://localhost:3000", {
+        auth: { token: "valid_token" },
+      });
+
+      socket.on("connect", (data) => {
+        socket.emit("set-currencies", ["pln", "eur", "czk"]);
+      });
+
+      socket.on("send-currencies", (currencies) => {
+        console.log(currencies);
+      });
+
+      socket.on("connect_error", (err) => {
+        console.error("Connection error:", err.message);
+      });
+
+      socket.on("disconnect", (data) =>
+        console.log(data, "client disconnected")
+      );
+
+      function displaySelectedCurrencies() {
+        const selectedList = document.getElementById("currencyList");
+        selectedList.innerHTML = "";
+
+        const checkboxes = document.querySelectorAll(
+          "#currencyForm input[type=checkbox]:checked"
+        );
+
+
+        const userSelectedCurrencies = [...checkboxes].map(checkbox => checkbox.getAttribute('value'))
+        
+        socket.emit("set-currencies", userSelectedCurrencies);
+        // checkboxes.forEach((checkbox) => {
+        //   const currencyName = checkbox.getAttribute("data-name");
+        //   const currencyFlag = checkbox.getAttribute("data-flag");
+        //   const currencyValue = checkbox.getAttribute("data-value");
+
+        //   const listItem = document.createElement("li");
+        //   listItem.textContent = `${currencyFlag} ${currencyName} - Value: ${currencyValue}`;
+        //   selectedList.appendChild(listItem);
+
+        // });
+      }
+    </script>
+  </body>
+</html>
